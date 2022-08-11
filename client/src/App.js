@@ -4,7 +4,8 @@ import { useDispatch } from 'react-redux';
 import { API } from './utils/consts';
 import './App.css';
 import { openSocket } from './store/slices/socketSlice';
-import MainPage from './store/pages/MainPage';
+import MainPage from './pages/MainPage';
+import { Box } from '@mui/material';
 
 const socket = io(API);
 
@@ -16,9 +17,9 @@ function App() {
 	}, []);
 
 	return (
-		<div>
+		<Box sx={{ display: 'flex', alignItems: 'center', height: '100vh' }}>
 			<MainPage />
-		</div>
+		</Box>
 	);
 }
 

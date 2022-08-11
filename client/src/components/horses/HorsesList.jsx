@@ -1,10 +1,17 @@
+import { CircularProgress } from '@mui/material';
+import { Box } from '@mui/system';
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { setTick, setResultList } from '../slices/raceData.slice';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+	setFinished,
+	setResultList,
+	setTick,
+} from '../../store/slices/raceData.slice';
+import OneHorse from './OneHorse';
 
-const MainPage = () => {
+const HorsesList = () => {
 	const {
-		raceData: { tick, resultList },
+		raceData: { tick },
 		socket: { socket },
 	} = useSelector((state) => state);
 	const dispatch = useDispatch();
@@ -44,12 +51,9 @@ const MainPage = () => {
 			dispatch(setTick(data));
 
 			const notFinished = findRestHorses(result, data);
-
-			console.log(notFinished, 'notFinished');
-
-			if (findFinishers(notFinished)) {
-				console.log(findFinishers(notFinished), 'findFinishers');
-				result.push(...findFinishers(notFinished));
+			const finishers = findFinishers(notFinished);
+			if (finishers) {
+				result.push(...finishers);
 			}
 
 			if (checkAllFinished(data)) {
@@ -57,8 +61,9 @@ const MainPage = () => {
 
 				result = [];
 
-				// disconnecting cuz server has no massage for stop ticker
+				// disconnecting cuz server has no message type to stop ticker
 				socket.disconnect();
+				dispatch(setFinished(true));
 			}
 		});
 	};
@@ -69,12 +74,24 @@ const MainPage = () => {
 			listenTickerAndCalculateResult();
 		}
 	}, [socket]);
-
-	useEffect(() => {
-		console.log(resultList);
-	}, [resultList]);
-
-	return <div>MainPage</div>;
+	return (
+		<Box
+			sx={{
+				flexGrow: 1,
+				textAlign: 'center',
+				backgroundColor: '#243d57',
+				height: 'min-content',
+				borderRadius: '5px',
+				padding: '0 15px',
+			}}
+		>
+			{tick.length > 0 ? (
+				tick.map((horse) => <OneHorse horse={horse} key={horse.name} />)
+			) : (
+				<CircularProgress />
+			)}
+		</Box>
+	);
 };
 
-export default MainPage;
+export default HorsesList;
